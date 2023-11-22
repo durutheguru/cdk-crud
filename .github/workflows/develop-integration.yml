@@ -3,11 +3,13 @@ name: Develop Branch Integration
 on:
   pull_request:
     branches: [ develop ]
+    types: [ closed ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v3
 
@@ -98,6 +100,7 @@ jobs:
     needs: [ build ]
     runs-on: ubuntu-latest
 
+    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -113,6 +116,8 @@ jobs:
           target_branch: 'main'
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+
 
 
 
