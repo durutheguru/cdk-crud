@@ -12,3 +12,4 @@ all:
             echo "Skipping $$dir as it has no recent Git changes"; \
         fi \
     done
+
