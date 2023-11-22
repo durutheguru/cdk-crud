@@ -1,7 +1,7 @@
 
 test:
 	echo "Testing Crud application"
-	./mvnw clean package
+	./mvnw clean test
 
 
 build:
