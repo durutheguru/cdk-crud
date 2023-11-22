@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v3
@@ -78,23 +78,15 @@ jobs:
       - id: login-ecr
         name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
 
       - name: Build Docker Image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          RELEASE_TAG=${{ steps.gitversion.outputs.semVer }}
-#          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.region.amazonaws.com
-          docker buildx build --platform linux/amd64,linux/arm64 -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:latest -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:$RELEASE_TAG --push .
-
-#      - name: Publish Docker image
-#        run: |
-#          RELEASE_TAG=${{ steps.gitversion.outputs.semVer }}
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:latest
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:$RELEASE_TAG
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:arm64v8-latest
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:arm64v8-$RELEASE_TAG
-#          echo "Pushed Docker Images with New Release"
+          REPOSITORY: crud
+          RELEASE_TAG: ${{ steps.gitversion.outputs.semVer }}
+        run: make
 
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -124,3 +116,6 @@ jobs:
           target_branch: 'main'
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+
+
