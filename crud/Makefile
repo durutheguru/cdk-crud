@@ -10,6 +10,8 @@ test:
 
 build:
 	echo "Building Crud application"
-	docker buildx build --platform linux/amd64,linux/arm64 -t "$(REPOSITORY):$(RELEASE_TAG)" -t "$(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)" --push .
+	echo "Image Tag: $(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)"
+	docker buildx build --platform linux/amd64,linux/arm64 -t "$(REPOSITORY):$(RELEASE_TAG)" -t "$(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)" .
+	docker push $(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)
 	#docker buildx build --platform linux/amd64,linux/arm64 -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:latest -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:$RELEASE_TAG --push .
 
