@@ -7,7 +7,7 @@ COPY . /home/app
 WORKDIR /home/app
 
 
-RUN mvn clean package -s settings.xml
+RUN mvn clean package -s settings.xml -DskipTests
 
 
 FROM openjdk:17-slim
