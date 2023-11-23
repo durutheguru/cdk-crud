@@ -15,3 +15,4 @@ build:
 	docker buildx build --platform linux/arm64 -t "$(REPOSITORY):$(RELEASE_TAG)" -t "$(REGISTRY)/$(REPOSITORY_ALIAS)/$(REPOSITORY):$(RELEASE_TAG)" --load .
 	docker push $(REGISTRY)/$(REPOSITORY_ALIAS)/$(REPOSITORY):$(RELEASE_TAG)
 
+
