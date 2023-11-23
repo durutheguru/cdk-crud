@@ -13,3 +13,4 @@ version:
 	./mvnw versions:commit
 	echo $(RELEASE_TAG) > version.ver
 
+
