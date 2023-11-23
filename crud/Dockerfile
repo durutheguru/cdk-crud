@@ -2,7 +2,6 @@ FROM maven:3.8.4-openjdk-17-slim AS build
 
 
 COPY . /home/app
-COPY ../settings.xml /home/app
 
 
 WORKDIR /home/app
