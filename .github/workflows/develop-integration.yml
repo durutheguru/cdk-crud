@@ -48,17 +48,13 @@ jobs:
           restore-keys: ${{ runner.os }}-m2-
 
       - name: Evaluate New Artifact Version
-        run: |
-          cd crud
-          NEW_VERSION=${{ steps.gitversion.outputs.semVer }}
-          echo "Artifact Semantic Version: $NEW_VERSION"
-          mvn versions:set -DnewVersion=${NEW_VERSION} -s settings.xml
+        env:
+          RELEASE_TAG: ${{ steps.gitversion.outputs.semVer }}
+        run: make version
 
-      - name: Upgrading Version
+      - name: Git Commit Version
         run: |
           RELEASE_TAG=${{ steps.gitversion.outputs.semVer }}
-          echo $RELEASE_TAG > version.ver
-          ls
           git config user.email ${{ secrets.GIT_EMAIL }}
           git config user.name ${{ secrets.GIT_USERNAME }}
           git add .
