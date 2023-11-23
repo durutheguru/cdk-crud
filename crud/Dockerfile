@@ -1,4 +1,23 @@
+FROM maven:3.8.4-openjdk-17-slim AS build
 
 
-mvn clean package
+COPY . /home/app
+COPY ../settings.xml /home/app
 
+
+WORKDIR /home/app
+
+
+RUN mvn clean package -s settings.xml
+
+
+FROM openjdk:17-slim
+
+
+COPY --from=build /home/app/target/*.jar /usr/local/lib/app.jar
+
+
+EXPOSE 8080
+
+
+ENTRYPOINT ["java", "-jar", "/usr/local/lib/app.jar"]
