@@ -87,6 +87,8 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: crud
           RELEASE_TAG: ${{ steps.gitversion.outputs.semVer }}
+          REGION: ${{ secrets.AWS_REGION }}
+          REPOSITORY_ALIAS: ${{ secrets.AWS_ECR_PUBLIC_REPOSITORY_ALIAS }}
         run: make
 
       - name: Push changes

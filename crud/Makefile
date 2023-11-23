@@ -10,8 +10,9 @@ test:
 
 build:
 	echo "Building Crud application"
-	echo "Image Tag: $(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)"
-	docker buildx build --platform linux/arm64 -t "$(REPOSITORY):$(RELEASE_TAG)" -t "$(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)" --load .
-	docker push $(REGISTRY)/$(REPOSITORY):$(RELEASE_TAG)
+	echo "Image Tag: $(REGISTRY)/$(REPOSITORY_ALIAS)/$(REPOSITORY):$(RELEASE_TAG)"
+	aws ecr-public create-repository --repository-name $(REPOSITORY) --region $(REGION) || true
+	docker buildx build --platform linux/arm64 -t "$(REPOSITORY):$(RELEASE_TAG)" -t "$(REGISTRY)/$(REPOSITORY_ALIAS)/$(REPOSITORY):$(RELEASE_TAG)" --load .
+	docker push $(REGISTRY)/$(REPOSITORY_ALIAS)/$(REPOSITORY):$(RELEASE_TAG)
 	#docker buildx build --platform linux/amd64,linux/arm64 -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:latest -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/crud:$RELEASE_TAG --push .
 
