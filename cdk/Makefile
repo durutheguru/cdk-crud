@@ -12,6 +12,6 @@ version:
 	./mvnw versions:set -DnewVersion=$(RELEASE_TAG) -s settings.xml
 	./mvnw versions:commit
 	echo $(RELEASE_TAG) > version.ver
-	echo $(GIT_COMMIT) >> version.ver
+	echo $(GITHUB_SHA) >> version.ver
 
 
