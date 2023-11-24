@@ -50,7 +50,9 @@ jobs:
       - name: Evaluate New Artifact Version
         env:
           RELEASE_TAG: ${{ steps.gitversion.outputs.semVer }}
-        run: make version
+        run: |
+          GIT_COMMIT=$(git rev-parse HEAD)
+          make version
 
       - name: Git Commit Version
         run: |
