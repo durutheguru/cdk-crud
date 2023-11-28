@@ -29,10 +29,10 @@ public class Main {
                 "region",
                 "githubOwner",
                 "githubRepo",
-                "githubBranch",
-                "db_username"
+                "githubBranch"
             )
         );
+        System.out.println("Variable Map: " + variableMap.toString());
 
         setAppName(variableMap.get("appName"));
 
