@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.julianduru.aws.beanstalk</groupId>
 	<artifactId>crud</artifactId>
-	<version>0.1.0-alpha.77</version>
+	<version>0.1.0-alpha.81</version>
 	<name>crud</name>
 	<description>Spring Boot CRUD application</description>
 	<properties>
