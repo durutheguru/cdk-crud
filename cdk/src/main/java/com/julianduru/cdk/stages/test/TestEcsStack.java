@@ -5,6 +5,7 @@ import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.ecs.*;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
+import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.constructs.Construct;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class TestEcsStack extends Stack {
         taskDefinition.addContainer(
             "crud-container",
             ContainerDefinitionOptions.builder()
-                .image(ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.77"))
+                .image(ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.81"))
                 .portMappings(
                     List.of(
                         PortMapping.builder()
@@ -58,6 +59,13 @@ public class TestEcsStack extends Stack {
             .publicLoadBalancer(true)
 //            .lis
             .build();
+
+        service.getTargetGroup().configureHealthCheck(
+            HealthCheck.builder()
+                .path("/actuator/health")
+                .port("8080")
+                .build()
+        );
     }
 
 

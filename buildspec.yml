@@ -22,7 +22,7 @@ phases:
       - cd ..
       - echo Writing the imagedefinitions.json file...
       - printf '[\n' > imagedefinitions.json
-      - printf '{"name":"crud-container","imageUri":"%s"}\n' public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.77 >> imagedefinitions.json
+      - printf '{"name":"crud-container","imageUri":"%s"}\n' public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.81 >> imagedefinitions.json
       - printf ']' >> imagedefinitions.json
 
 
