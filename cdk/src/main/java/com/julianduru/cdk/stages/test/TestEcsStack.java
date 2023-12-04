@@ -38,7 +38,7 @@ public class TestEcsStack extends Stack {
             .taskImageOptions(
                 ApplicationLoadBalancedTaskImageOptions.builder()
                     .image(
-                        ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.84")
+                        ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.87")
                     )
                     .enableLogging(true)
                     .logDriver(
