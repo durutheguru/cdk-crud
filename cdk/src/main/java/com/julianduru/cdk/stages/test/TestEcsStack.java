@@ -32,13 +32,39 @@ public class TestEcsStack extends Stack {
     }
 
 
+
+//    private void setup() {
+//        service = ApplicationLoadBalancedFargateService.Builder
+//            .create(this, Main.prefixApp("ECSFargateService"))
+//            .taskImageOptions(
+//                ApplicationLoadBalancedTaskImageOptions.builder()
+//                    .image(
+//                        ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.87")
+//                    )
+//                    .enableLogging(true)
+//                    .logDriver(
+//                        LogDriver.awsLogs(
+//                            AwsLogDriverProps.builder()
+//                                .streamPrefix("str-prfix")
+//                                .build()
+//                        )
+//                    )
+//                    .build()
+//            )
+//            .publicLoadBalancer(true)
+//            .assignPublicIp(true)
+//            .build();
+//
+//    }
+
+
     private void setup() {
         service = ApplicationLoadBalancedFargateService.Builder
             .create(this, Main.prefixApp("ECSFargateService"))
             .taskImageOptions(
                 ApplicationLoadBalancedTaskImageOptions.builder()
                     .image(
-                        ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.87")
+                        ContainerImage.fromRegistry("public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.84")
                     )
                     .enableLogging(true)
                     .logDriver(
@@ -48,13 +74,20 @@ public class TestEcsStack extends Stack {
                                 .build()
                         )
                     )
+                    .containerPort(8080)
                     .build()
             )
             .publicLoadBalancer(true)
-            .assignPublicIp(true)
             .build();
 
+        service.getTargetGroup().configureHealthCheck(
+            HealthCheck.builder()
+                .path("/actuator/health")
+                .port("8080")
+                .build()
+        );
     }
+
 
 
 //    private void setup() {
