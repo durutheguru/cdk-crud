@@ -1,6 +1,6 @@
 package com.julianduru.cdk;
 
-import com.julianduru.cdk.stages.test.TestElasticBeanstalkStack;
+import com.julianduru.cdk.stages.test.TestEcsStack;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.Stack;
@@ -11,7 +11,7 @@ import software.amazon.awscdk.services.codepipeline.Pipeline;
 import software.amazon.awscdk.services.codepipeline.PipelineProps;
 import software.amazon.awscdk.services.codepipeline.StageProps;
 import software.amazon.awscdk.services.codepipeline.actions.CodeBuildAction;
-import software.amazon.awscdk.services.codepipeline.actions.ElasticBeanstalkDeployAction;
+import software.amazon.awscdk.services.codepipeline.actions.EcsDeployAction;
 import software.amazon.awscdk.services.codepipeline.actions.GitHubSourceAction;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketProps;
@@ -29,6 +29,8 @@ public class CodePipelineStack extends Stack {
 
     private String githubBranch;
 
+    private StackProps stackProps;
+
 
     public CodePipelineStack(final Construct scope, final String id, final StackProps props, final Map<String, String> variableMap) {
         super(scope, id, props);
@@ -37,26 +39,30 @@ public class CodePipelineStack extends Stack {
         this.githubRepo = variableMap.get("githubRepo");
         this.githubBranch = variableMap.get("githubBranch");
 
-        Bucket codePipelineBucket = createCodePipelineBucket();
+        this.stackProps = props;
+
+        Bucket codePipelineBucket = createCodePipelineBucket(variableMap.get("codePipelineBucket"));
         Project buildProject = createBuildProject();
 
         createPipeline(codePipelineBucket, buildProject, variableMap);
     }
 
 
-    private Bucket createCodePipelineBucket() {
+    private Bucket createCodePipelineBucket(String codePipelineBucketName) {
         return new Bucket(this,
-            Main.prefixApp("code-pipeline-ebs-resource-bucket").toLowerCase(),
+            Main.prefixApp("code-pipeline-ecs-resource-bucket").toLowerCase(),
             BucketProps.builder()
-                .bucketName(Main.prefixApp("code-pipeline-bucket-18938817843").toLowerCase())
+//                .bucketName(Main.prefixApp("code-pipeline-bucket-18938817843").toLowerCase())
+                .bucketName(Main.prefixApp(codePipelineBucketName).toLowerCase())
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .autoDeleteObjects(true)
                 .build()
         );
     }
 
+
     private Project createBuildProject() {
-        return PipelineProject.Builder.create(this, Main.prefixApp("EBS-CodePipelineProject"))
+        return PipelineProject.Builder.create(this, Main.prefixApp("ECS-CodePipelineProject"))
             .environment(BuildEnvironment.builder().buildImage(LinuxBuildImage.STANDARD_7_0).build())
             .buildSpec(BuildSpec.fromSourceFilename("buildspec.yml"))
             .build();
@@ -79,7 +85,7 @@ public class CodePipelineStack extends Stack {
                                     .oauthToken(SecretValue.secretsManager("github-token"))
                                     .output(
                                         Artifact.artifact(
-                                            Main.prefixApp("EBS-SourceArtifact")
+                                            Main.prefixApp("ECS-SourceArtifact")
                                         )
                                     )
                                     .build()
@@ -96,13 +102,13 @@ public class CodePipelineStack extends Stack {
                                     .project(buildProject)
                                     .input(
                                         Artifact.artifact(
-                                            Main.prefixApp("EBS-SourceArtifact")
+                                            Main.prefixApp("ECS-SourceArtifact")
                                         )
                                     )
                                     .outputs(
                                         Collections.singletonList(
                                             Artifact.artifact(
-                                                Main.prefixApp("EBS-BuildArtifact")
+                                                Main.prefixApp("ECS-BuildArtifact")
                                             )
                                         )
                                     )
@@ -113,7 +119,7 @@ public class CodePipelineStack extends Stack {
 
                     StageProps.builder()
                         .stageName("Test-Deploy")
-                        .actions(Collections.singletonList(getTestEBSDeployAction(variableMap)))
+                        .actions(Collections.singletonList(getECSDeployAction(variableMap)))
                         .build()
                 )
             )
@@ -123,20 +129,15 @@ public class CodePipelineStack extends Stack {
     }
 
 
-    private ElasticBeanstalkDeployAction getTestEBSDeployAction(Map<String, String> variableMap) {
-        TestElasticBeanstalkStack ebsStack = new TestElasticBeanstalkStack(
-            this, Main.prefixApp("ebsStackId"), null, variableMap
+    private EcsDeployAction getECSDeployAction(final Map<String, String> variableMap) {
+        TestEcsStack ecsStack = new TestEcsStack(
+            this, Main.prefixApp("ecsStackId"), stackProps, variableMap
         );
 
-        return ElasticBeanstalkDeployAction.Builder.create()
-            .actionName("ElasticBeanstalkDeployAction")
-            .applicationName(ebsStack.getApplication().getApplicationName())
-            .environmentName(ebsStack.getEbsEnvironment().getEnvironmentName())
-            .input(
-                Artifact.artifact(
-                    Main.prefixApp("EBS-BuildArtifact")
-                )
-            )
+        return EcsDeployAction.Builder.create()
+            .actionName(Main.prefixApp("ECSDeployAction"))
+            .service(ecsStack.getApplicationLoadBalancedFargateService().getService())
+            .input(Artifact.artifact(Main.prefixApp("ECS-BuildArtifact")))
             .build();
     }
 

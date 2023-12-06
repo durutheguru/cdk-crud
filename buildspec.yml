@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+
+  build:
+    commands:
+      - echo "Running Infrastructure Update..."
+      - npm install -g aws-cdk
+      - cd cdk
+      - >-
+        cdk deploy
+        -c appName=CRUD
+        -c account=058486276453  
+        -c region=us-east-1 
+        -c githubOwner=durutheguru 
+        -c githubRepo=cdk-patterns 
+        -c githubBranch=main 
+        --all --verbose --require-approval never
+      - cd ..
+      - echo Writing the imagedefinitions.json file...
+      - printf '[\n' > imagedefinitions.json
+      - printf '{"name":"crud-container","imageUri":"%s"}\n' public.ecr.aws/h9p9w3g7/crud:0.1.0-alpha.84 >> imagedefinitions.json
+      - printf ']' >> imagedefinitions.json
+
+
+artifacts:
+  files: imagedefinitions.json
+
